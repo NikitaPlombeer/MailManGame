@@ -2839,7 +2839,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!64 &73968583
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -11668,6 +11668,8 @@ MonoBehaviour:
   targetAngle: 0
   leftAngle: 0
   rightAngle: 0
+  leftAngleDiff: 0
+  rightAngleDiff: 0
   trackSeconds: 0.5
   trackTime: 0
   maxMouseShiftY: -100
@@ -31461,7 +31463,7 @@ MonoBehaviour:
   boxController: {fileID: 324950914}
   ragdollController: {fileID: 934571273}
   isMoving: 1
-  speed: 0
+  speed: 4
   jumpSpeed: 4
   animationMovement: 0.5
   mouseShiftToJump: 6

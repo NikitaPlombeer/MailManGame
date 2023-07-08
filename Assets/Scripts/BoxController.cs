@@ -66,13 +66,7 @@ public class BoxController : MonoBehaviour
     public float trackTime = 0f;
     public float maxMouseShiftY = -100f;
 
-    // public AnimationCurve curve;
-    
     // Update is called once per frame
-
-    private float testTime;
-    private float maxDiff;
-    public float maxDiffSoFar;
 
     void LateUpdate()
     {
@@ -116,53 +110,33 @@ public class BoxController : MonoBehaviour
         
         float currentAngle = Vector3.SignedAngle(Vector3.forward, boxForward, Vector3.up);
         if (currentAngle < 0) currentAngle += 360;
-        if (rightAngle > 360f && currentAngle < 180f) currentAngle += 360f;
+        if (rightAngle > 180f && currentAngle < 180f) currentAngle += 360f;
+  
+        if (currentAngle > 180f && leftAngle < 180f)
+        {
+            leftAngle += 360f;
+            rightAngle += 360f;
+        }
         
         leftAngleDiff = Mathf.Abs(currentAngle - leftAngle);
         rightAngleDiff = Mathf.Abs(currentAngle - rightAngle);
 
-        if (currentAngle < leftAngle)
-        {
-            currentAngle = leftAngle;
-            deltaAngle = 0f;
-        }
-        else if (currentAngle > rightAngle)
-        {
-            currentAngle = rightAngle;
-            deltaAngle = 0f;
-        }
         
         this.targetAngle = currentAngle + deltaAngle;
-        // this.targetAngle = Mathf.Clamp(targetAngle, leftAngle, rightAngle);
         if (targetAngle < leftAngle || targetAngle > rightAngle)
         {
             if (leftAngleDiff < rightAngleDiff)
             {
                 targetAngle = leftAngle;
-                Debug.Log("Force left");
+                // Debug.Log($"Force left leftAngleDiff={leftAngleDiff} rightAngleDiff={rightAngleDiff} targetAngle={targetAngle} currentAngle={currentAngle} leftAngle={leftAngle} rightAngle={rightAngle}");
             }
             else
             {
                 targetAngle = rightAngle;
-                Debug.Log("Force right");
+                // Debug.Log($"Force right leftAngleDiff={leftAngleDiff} rightAngleDiff={rightAngleDiff} targetAngle={targetAngle} currentAngle={currentAngle} leftAngle={leftAngle} rightAngle={rightAngle}");
             }
         }
-        // if (currentAngle < leftAngle) currentAngle = leftAngle;
-        // if (currentAngle > rightAngle) currentAngle = rightAngle;
-        
-        
-        // this.targetAngle = Mathf.Clamp(targetAngle, leftAngle, rightAngle);
-        
-        
-        testTime += Time.deltaTime;
-        maxDiff = Mathf.Max(maxDiff, Mathf.Abs(targetAngle - currentAngle));
-        if (testTime > 1f)
-        {
-            maxDiffSoFar = maxDiff;
-            maxDiff = -100f;
-            testTime = 0f;
-        }
-        
+
         var targetDirection = Quaternion.AngleAxis(targetAngle, Vector3.up) * Vector3.forward;
         currentPosition = mailManPosition + targetDirection * radius;
 
