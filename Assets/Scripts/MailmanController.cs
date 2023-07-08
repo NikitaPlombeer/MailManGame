@@ -110,14 +110,16 @@ public class MailmanController : MonoBehaviour
         {
             speedK = 1f;
         }
-        var translation = direction * (speed * speedK) * Time.deltaTime;
-        // rb.MovePosition(transform.position + translation);
-        var velocityY = rb.velocity.y;
-        rb.velocity = (translation / Time.deltaTime).Flatten(velocityY);
+        var translation = direction * (speed * speedK) * Time.fixedDeltaTime;
+        rb.MovePosition(transform.position + translation);
+        // var velocityY = rb.velocity.y;
+        // rb.velocity = (translation / Time.fixedDeltaTime).Flatten(velocityY);
+        // boxController.SetPosition();
+        // boxPosition += translation;
+        // box.position = boxPosition;
+        // boxController.rb.MovePosition(boxPosition); //velocity = (translation / Time.deltaTime);
         
-        boxPosition += translation;
-        box.position = boxPosition;
-
+        // ragdollController.ikController.Sync();
         angle = Vector3.SignedAngle(transform.forward, direction, Vector3.up);
         animationMovement = Mathf.Clamp01((angle / boxController.maxAngle + 1f) / 2f);
         animator.SetFloat(MovementAnimationKey, animationMovement);
@@ -127,7 +129,6 @@ public class MailmanController : MonoBehaviour
     {
         while (isMoving)
         {
-
             prevRotation = Quaternion.LookRotation(box.forward);
             var current = rb.rotation;
             float time = 0f;

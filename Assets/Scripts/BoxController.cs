@@ -54,7 +54,7 @@ public class BoxController : MonoBehaviour
     [BoxGroup("Debug")]
     [ReadOnly]
     public float rightAngleDiff;
-    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -67,11 +67,17 @@ public class BoxController : MonoBehaviour
     public float maxMouseShiftY = -100f;
 
     // Update is called once per frame
+    
+    void Update()
+    {
+        Sync();
+    }
 
-    void LateUpdate()
+    public void Sync()
     {
         if (!isMovingEnabled) return;
 
+        float delta = Time.fixedDeltaTime;
         var mailManPosition = mailMan.position;
         var currentPosition = transform.position;
 
@@ -81,14 +87,15 @@ public class BoxController : MonoBehaviour
         if (mouseShiftY > 10f) mouseShiftY = 10f; // TODO: maybe depends on screen resolution
         
         maxMouseShiftY = Mathf.Max(maxMouseShiftY, mouseShiftY);
-        trackTime += Time.deltaTime;
+        trackTime += delta;
         if (trackTime > trackSeconds)
         {
             trackTime = 0f;
             maxMouseShiftY = mouseShiftY;
         }
         
-        var translationY = mouseShiftY * speedY * Time.deltaTime;
+        var translationY = mouseShiftY * speedY * delta;
+        yMovement = Mathf.Clamp01(yMovement + translationY);
 
         var mailManForward = mailMan.forward;
         var leftMostDirection = Quaternion.AngleAxis(-maxAngle, Vector3.up) * mailManForward;
@@ -103,7 +110,7 @@ public class BoxController : MonoBehaviour
         
         this.leftAngle = Vector3.SignedAngle(Vector3.forward, leftMostDirection, Vector3.up);
         float currentAngle = Vector3.SignedAngle(Vector3.forward, boxForward, Vector3.up);
-        var deltaAngle = angleSpeed * mouseShiftX * Time.deltaTime;
+        var deltaAngle = angleSpeed * mouseShiftX * delta;
         if (deltaAngle > maxAngle * 2) deltaAngle = maxAngle * 2;
         
         var leftAngleObj = new Angle(leftAngle);
@@ -121,10 +128,33 @@ public class BoxController : MonoBehaviour
             this.targetAngle = targetAngleObj.StickTo(leftAngleObj, rightAngleObj).rawAngle;
         }
         
+        SetPosition();
+        
+        // var targetDirection = Quaternion.AngleAxis(targetAngle, Vector3.up) * Vector3.forward;
+        // currentPosition = mailManPosition + targetDirection * radius;
+        //
+        // yMovement = Mathf.Clamp01(yMovement + translationY);
+        // currentPosition.y = mailManPosition.y + Mathf.Lerp(startPos.y, topPosition.y, yMovement);
+        //
+        // transform.position = currentPosition;
+        //
+        // var mailmanPoxXZ = mailManPosition.Flatten();
+        // var boxPosition = transform.position;
+        // var boxPosXZ = boxPosition.Flatten();
+        // var direction = (boxPosXZ - mailmanPoxXZ).normalized;
+        // float angle = Vector3.SignedAngle(Vector3.forward, direction, Vector3.up);
+        // transform.rotation = Quaternion.Euler(0f, angle, 0f);
+    }
+
+    public void SetPosition()
+    {
+        var currentPosition = transform.position;
+        var mailManPosition = mailMan.position;
+
         var targetDirection = Quaternion.AngleAxis(targetAngle, Vector3.up) * Vector3.forward;
         currentPosition = mailManPosition + targetDirection * radius;
 
-        yMovement = Mathf.Clamp01(yMovement + translationY);
+        // yMovement = Mathf.Clamp01(yMovement + translationY);
         currentPosition.y = mailManPosition.y + Mathf.Lerp(startPos.y, topPosition.y, yMovement);
         
         transform.position = currentPosition;

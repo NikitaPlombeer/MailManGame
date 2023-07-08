@@ -61010,7 +61010,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1901364589
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70443,6 +70443,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5145768715808337590, guid: 590e3b92ced0643d7b1a776f573b2b31,
+        type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5145768715808426028, guid: 590e3b92ced0643d7b1a776f573b2b31,
+        type: 3}
+      propertyPath: speed
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 5145768716575609478, guid: 590e3b92ced0643d7b1a776f573b2b31,
         type: 3}
       propertyPath: m_RootOrder
