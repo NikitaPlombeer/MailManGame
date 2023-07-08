@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Utils;
 
 public class BoxController : MonoBehaviour
 {
@@ -26,6 +27,8 @@ public class BoxController : MonoBehaviour
 
     public float yMovement = 0f;
     
+    public bool isMovingEnabled = true;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -38,6 +41,7 @@ public class BoxController : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
+        if (!isMovingEnabled) return;
         // mouseShift = Input.mousePosition - lastMousePosition;
         // lastMousePosition = Input.mousePosition;
 
@@ -55,7 +59,7 @@ public class BoxController : MonoBehaviour
             trackTime = 0f;
             if (maxMouseShiftY > 0f)
             {
-                Debug.Log("Current maxMouseShiftY: " + maxMouseShiftY);
+                // Debug.Log("Current maxMouseShiftY: " + maxMouseShiftY);
             }
             maxMouseShiftY = -100f;
   
@@ -68,8 +72,15 @@ public class BoxController : MonoBehaviour
         yMovement = Mathf.Clamp01(yMovement + translationY);
         var startPoxYZ = new Vector3(0f, startPos.y, startPos.z);
         var lerp = Vector3.Lerp(startPoxYZ, topPosition, yMovement);
-        currentPosition.y = lerp.y;
+        currentPosition.y = mailManPosition.y + lerp.y;
         currentPosition.z = mailManPosition.z + lerp.z;
         transform.position = currentPosition;
+        
+        var mailmanPoxXZ = mailManPosition.Flatten();
+        var boxPosition = transform.position;
+        var boxPosXZ = boxPosition.Flatten();
+        var direction = (boxPosXZ - mailmanPoxXZ).normalized;
+        float angle = Vector3.SignedAngle(Vector3.forward, direction, Vector3.up);
+        transform.rotation = Quaternion.Euler(0f, angle, 0f);
     }
 }

@@ -1,46 +1,77 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using IKUtils;
+using DefaultNamespace;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using Utils;
 
 public class MailmanController : MonoBehaviour
 {
-    
-    [Header("Hands")] 
-    public IKConfig LeftHandConfig;
-    public IKConfig RightHandConfig;
+    private static readonly int MovementAnimationKey = Animator.StringToHash("Movement");
 
-    [Header("Foots")]
-    public IKConfig LeftFootConfig;
-    public IKConfig RightFootConfig;
-    
-    public bool IsIKActive;
+    [BoxGroup("Dependencies")]
     public Animator animator;
-
-    public float speed = 3;
-    public float jumpSpeed = 5;
-    public Transform box;
-    public float animationMovement = 0.5f;
-    public float angle;
+    
+    [BoxGroup("Dependencies")]
     public Rigidbody rb;
+    
+    [BoxGroup("Dependencies")]
+    public BoxController boxController;
+    
+    [BoxGroup("Dependencies")]
+    public MailmanRagdollController ragdollController;
 
-    private BoxController boxController;
-
+    
+    [BoxGroup("Movement")]
+    [ReadOnly]
+    public bool isMoving = true;
+    
+    [BoxGroup("Movement")]
+    public float speed = 3;
+    
+    [BoxGroup("Movement")]
+    public float jumpSpeed = 5;
+    
+    [BoxGroup("Movement")]
+    public float animationMovement = 0.5f;
+    
+    [BoxGroup("Movement")]
     public float mouseShiftToJump = 10f;
+    
+    [BoxGroup("Movement")]
+    public float ragdollSpeed = 10f;
+    
+    [BoxGroup("Movement")]
+    [ReadOnly]
+    public bool isJumpOnCooldown = false;
+
+   
+    
+    [BoxGroup("Debug")]
+    [ReadOnly]
+    public float angle;
+
+    private Transform box;
+    
+    
     private void Start()
     {
-        boxController = FindObjectOfType<BoxController>();
+        box = boxController.transform;
+        StartCoroutine(trackRotation());
     }
 
-    public bool isJumpOnCooldown = false;
     private void Update()
     {
-        // if (Input.GetKeyDown(KeyCode.Space))
-        // {
-        //     rb.velocity = Vector3.up * jumpSpeed;
-        // }
+        if (!isMoving) return;
+        
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            this.isMoving = false;
+            rb.velocity = Vector3.up * ragdollSpeed + Vector3.forward * ragdollSpeed;
+            boxController.isMovingEnabled = false;
+            Invoke(nameof(EnableRagdoll), 0.2f);
+            EnableRagdoll();
+            return;
+        }
 
         if (!isJumpOnCooldown && boxController.yMovement > 0.9f && boxController.maxMouseShiftY > mouseShiftToJump)
         {
@@ -48,22 +79,12 @@ public class MailmanController : MonoBehaviour
             isJumpOnCooldown = true;
             Invoke(nameof(ResetJumpCooldown), 1f);
         }
+    }
 
-        // var mailmanPoxXZ = transform.position.Flatten();
-        // var boxPosXZ = box.position.Flatten();
-        // var direction = (boxPosXZ - mailmanPoxXZ).normalized;
-        //
-        // // var currentPosition = transform.position;
-        // var translation = direction * speed * Time.deltaTime;
-        // rb.MovePosition(transform.position + translation);
-        //
-        // // currentPosition += translation;
-        // // transform.position = currentPosition;
-        // box.position = box.position + translation;
-        //
-        // angle = Vector3.SignedAngle(transform.forward, direction, Vector3.up);
-        // animationMovement = Mathf.Clamp01((angle / 26f + 1f) / 2f);
-        // animator.SetFloat("Movement", animationMovement);
+    public void EnableRagdoll()
+    {
+        rb.isKinematic = true;
+        ragdollController.EnableRagdoll();
     }
     
     public void ResetJumpCooldown()
@@ -71,67 +92,53 @@ public class MailmanController : MonoBehaviour
         isJumpOnCooldown = false;
     }
 
+    public Quaternion prevRotation = Quaternion.LookRotation(Vector3.forward);
     private void FixedUpdate()
     {
+        if (!isMoving) return;
+
         var mailmanPoxXZ = transform.position.Flatten();
-        var boxPosXZ = box.position.Flatten();
+        var boxPosition = box.position;
+        var boxPosXZ = boxPosition.Flatten();
         var direction = (boxPosXZ - mailmanPoxXZ).normalized;
         
-        // var currentPosition = transform.position;
-        var translation = direction * speed * Time.deltaTime;
+        var speedK = Mathf.Clamp(1f - boxController.yMovement, 0.7f, 1f);
+        if (isJumpOnCooldown)
+        {
+            speedK = 1f;
+        }
+        var translation = direction * (speed * speedK) * Time.deltaTime;
         rb.MovePosition(transform.position + translation);
         
-        // currentPosition += translation;
-        // transform.position = currentPosition;
-        box.position = box.position + translation;
+        // rb.MoveRotation(prevRotation);
+        // prevRotation = Quaternion.LookRotation(box.forward);
+        // rb.MoveRotation(Quaternion.LookRotation(box.forward));
+        
+        boxPosition += translation;
+        box.position = boxPosition;
 
         angle = Vector3.SignedAngle(transform.forward, direction, Vector3.up);
         animationMovement = Mathf.Clamp01((angle / 26f + 1f) / 2f);
-        animator.SetFloat("Movement", animationMovement);
+        animator.SetFloat(MovementAnimationKey, animationMovement);
     }
 
-    void OnAnimatorIK(int layerIndex)
+    public IEnumerator trackRotation()
     {
-        if (IsIKActive)
+        while (isMoving)
         {
-            HandleConfig(AvatarIKGoal.LeftHand, LeftHandConfig);
-            HandleConfig(AvatarIKGoal.RightHand, RightHandConfig);
-            HandleConfig(AvatarIKGoal.LeftFoot, LeftFootConfig);
-            HandleConfig(AvatarIKGoal.RightFoot, RightFootConfig);
+            prevRotation = Quaternion.LookRotation(box.forward);
+            var current = rb.rotation;
+            float time = 0f;
+            while (time < 1f)
+            {
+                rb.MoveRotation(Quaternion.Lerp(current, prevRotation, time));
+                yield return new WaitForFixedUpdate();
+                time += Time.fixedDeltaTime;
+            }
+            // yield return new WaitForSeconds(1f);
         }
-        else
-        {
-            SetIKWeights(AvatarIKGoal.LeftHand, new IKWeight(0f));
-            SetIKWeights(AvatarIKGoal.RightHand, new IKWeight(0f));
-            SetIKWeights(AvatarIKGoal.LeftFoot, new IKWeight(0f));
-            SetIKWeights(AvatarIKGoal.RightFoot, new IKWeight(0f));
-            
-            animator.SetLookAtWeight(0);
-        }
+
+        yield return null;
     }
 
-    private void HandleConfig(AvatarIKGoal goal, IKConfig config)
-    {
-        if (config.isEnabled && config.target != null)
-        {
-            SetIKWeights(goal, config.weight);
-            SetIKTarget(goal, config.target);
-        }
-        else
-        {
-            SetIKWeights(goal, new IKWeight(0f));
-        }
-    }
-
-    private void SetIKWeights(AvatarIKGoal goal, IKWeight weight)
-    {
-        animator.SetIKPositionWeight(goal, weight.positionWeight);
-        animator.SetIKRotationWeight(goal, weight.rotationWeight);
-    }
-        
-    private void SetIKTarget(AvatarIKGoal goal, Transform target)
-    {
-        animator.SetIKPosition(goal, target.position);
-        animator.SetIKRotation(goal, target.rotation);
-    }
 }
