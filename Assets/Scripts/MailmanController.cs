@@ -111,7 +111,9 @@ public class MailmanController : MonoBehaviour
             speedK = 1f;
         }
         var translation = direction * (speed * speedK) * Time.deltaTime;
-        rb.MovePosition(transform.position + translation);
+        // rb.MovePosition(transform.position + translation);
+        var velocityY = rb.velocity.y;
+        rb.velocity = (translation / Time.deltaTime).Flatten(velocityY);
         
         boxPosition += translation;
         box.position = boxPosition;
