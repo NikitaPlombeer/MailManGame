@@ -11664,7 +11664,7 @@ MonoBehaviour:
   topPosition: {x: 0, y: 1.95, z: 0.45}
   yMovement: 0
   isMovingEnabled: 1
-  maxAngle: 26
+  maxAngle: 45
   targetAngle: 0
   leftAngle: 0
   rightAngle: 0
@@ -11673,7 +11673,6 @@ MonoBehaviour:
   trackSeconds: 0.5
   trackTime: 0
   maxMouseShiftY: -100
-  maxDiffSoFar: 0
 --- !u!65 &324950915
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -31463,12 +31462,12 @@ MonoBehaviour:
   boxController: {fileID: 324950914}
   ragdollController: {fileID: 934571273}
   isMoving: 1
-  speed: 4
+  speed: 5
   jumpSpeed: 4
   animationMovement: 0.5
   mouseShiftToJump: 6
   ragdollSpeed: 10
-  rotationSyncTime: 1
+  rotationSyncTime: 1.5
   isJumpOnCooldown: 0
   angle: 0
   prevRotation: {x: 0, y: 0, z: 0, w: 1}

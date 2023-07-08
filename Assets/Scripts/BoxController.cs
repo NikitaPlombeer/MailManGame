@@ -78,6 +78,7 @@ public class BoxController : MonoBehaviour
         mouseShiftX = Input.GetAxis("Mouse X");
         mouseShiftY = Input.GetAxis("Mouse Y");
         if (mouseShiftX > 10f) mouseShiftX = 10f; // TODO: maybe depends on screen resolution
+        if (mouseShiftY > 10f) mouseShiftY = 10f; // TODO: maybe depends on screen resolution
         
         maxMouseShiftY = Mathf.Max(maxMouseShiftY, mouseShiftY);
         trackTime += Time.deltaTime;
@@ -87,7 +88,6 @@ public class BoxController : MonoBehaviour
             maxMouseShiftY = mouseShiftY;
         }
         
-        var translationX = mouseShiftX * speedX * Time.deltaTime;
         var translationY = mouseShiftY * speedY * Time.deltaTime;
 
         var mailManForward = mailMan.forward;
@@ -102,41 +102,25 @@ public class BoxController : MonoBehaviour
         Debug.DrawRay(mailManPosition, boxForward * 5, Color.yellow);
         
         this.leftAngle = Vector3.SignedAngle(Vector3.forward, leftMostDirection, Vector3.up);
-        if (leftAngle < 0) leftAngle += 360;
-        this.rightAngle = leftAngle + maxAngle * 2f;
-        
+        float currentAngle = Vector3.SignedAngle(Vector3.forward, boxForward, Vector3.up);
         var deltaAngle = angleSpeed * mouseShiftX * Time.deltaTime;
         if (deltaAngle > maxAngle * 2) deltaAngle = maxAngle * 2;
         
-        float currentAngle = Vector3.SignedAngle(Vector3.forward, boxForward, Vector3.up);
-        if (currentAngle < 0) currentAngle += 360;
-        if (rightAngle > 180f && currentAngle < 180f) currentAngle += 360f;
-  
-        if (currentAngle > 180f && leftAngle < 180f)
+        var leftAngleObj = new Angle(leftAngle);
+        var rightAngleObj = leftAngleObj.plus(maxAngle * 2f);
+        
+        var currentAngleObj = new Angle(currentAngle);
+        var targetAngleObj = currentAngleObj.plus(deltaAngle);
+
+        if (targetAngleObj.IsBetween(leftAngleObj, rightAngleObj))
         {
-            leftAngle += 360f;
-            rightAngle += 360f;
+            this.targetAngle = targetAngleObj.rawAngle;
+        }
+        else
+        {
+            this.targetAngle = targetAngleObj.StickTo(leftAngleObj, rightAngleObj).rawAngle;
         }
         
-        leftAngleDiff = Mathf.Abs(currentAngle - leftAngle);
-        rightAngleDiff = Mathf.Abs(currentAngle - rightAngle);
-
-        
-        this.targetAngle = currentAngle + deltaAngle;
-        if (targetAngle < leftAngle || targetAngle > rightAngle)
-        {
-            if (leftAngleDiff < rightAngleDiff)
-            {
-                targetAngle = leftAngle;
-                // Debug.Log($"Force left leftAngleDiff={leftAngleDiff} rightAngleDiff={rightAngleDiff} targetAngle={targetAngle} currentAngle={currentAngle} leftAngle={leftAngle} rightAngle={rightAngle}");
-            }
-            else
-            {
-                targetAngle = rightAngle;
-                // Debug.Log($"Force right leftAngleDiff={leftAngleDiff} rightAngleDiff={rightAngleDiff} targetAngle={targetAngle} currentAngle={currentAngle} leftAngle={leftAngle} rightAngle={rightAngle}");
-            }
-        }
-
         var targetDirection = Quaternion.AngleAxis(targetAngle, Vector3.up) * Vector3.forward;
         currentPosition = mailManPosition + targetDirection * radius;
 
