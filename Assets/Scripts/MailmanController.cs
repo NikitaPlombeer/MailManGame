@@ -39,6 +39,9 @@ public class MailmanController : MonoBehaviour
     
     [BoxGroup("Movement")]
     public float ragdollSpeed = 10f;
+
+    [BoxGroup("Movement")]
+    public float rotationSyncTime = 1f;
     
     [BoxGroup("Movement")]
     [ReadOnly]
@@ -110,15 +113,11 @@ public class MailmanController : MonoBehaviour
         var translation = direction * (speed * speedK) * Time.deltaTime;
         rb.MovePosition(transform.position + translation);
         
-        // rb.MoveRotation(prevRotation);
-        // prevRotation = Quaternion.LookRotation(box.forward);
-        // rb.MoveRotation(Quaternion.LookRotation(box.forward));
-        
         boxPosition += translation;
         box.position = boxPosition;
 
         angle = Vector3.SignedAngle(transform.forward, direction, Vector3.up);
-        animationMovement = Mathf.Clamp01((angle / 26f + 1f) / 2f);
+        animationMovement = Mathf.Clamp01((angle / boxController.maxAngle + 1f) / 2f);
         animator.SetFloat(MovementAnimationKey, animationMovement);
     }
 
@@ -126,16 +125,19 @@ public class MailmanController : MonoBehaviour
     {
         while (isMoving)
         {
+
             prevRotation = Quaternion.LookRotation(box.forward);
             var current = rb.rotation;
             float time = 0f;
-            while (time < 1f)
+            while (time < rotationSyncTime)
             {
-                rb.MoveRotation(Quaternion.Lerp(current, prevRotation, time));
+                var k = time / rotationSyncTime;
+                rb.MoveRotation(Quaternion.Lerp(current, prevRotation, k));
                 yield return new WaitForFixedUpdate();
                 time += Time.fixedDeltaTime;
             }
-            // yield return new WaitForSeconds(1f);
+            rb.MoveRotation(prevRotation);
+            
         }
 
         yield return null;
