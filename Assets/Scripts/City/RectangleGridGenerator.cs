@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace City
 {
@@ -124,7 +126,8 @@ namespace City
         }
     }
     
-    public class Rectangle
+    [Serializable]
+    public struct Rectangle
     {
         public int X { get; set; }
         public int Y { get; set; }

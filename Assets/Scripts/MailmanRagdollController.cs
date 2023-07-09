@@ -12,10 +12,6 @@ namespace DefaultNamespace
         public MailmanIKController ikController;
         public Collider playmodeCollider;
         
-        private void Start()
-        {
-            DisableRagdoll();
-        }
 
         public void EnableRagdoll()
         {

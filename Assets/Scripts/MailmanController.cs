@@ -22,8 +22,7 @@ public class MailmanController : MonoBehaviour
 
     
     [BoxGroup("Movement")]
-    [ReadOnly]
-    public bool isMoving = true;
+    public bool isMoving = false;
     
     [BoxGroup("Movement")]
     public float baseSpeed = 4;
@@ -74,6 +73,8 @@ public class MailmanController : MonoBehaviour
     private Transform box;
 
     public BuffEffectUI buffEffectUI;
+
+    public bool isInBox = false;
     
     private void Start()
     {
@@ -88,7 +89,7 @@ public class MailmanController : MonoBehaviour
     {
         if (!isMoving) return;
         
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (isInBox && Input.GetKeyDown(KeyCode.Space))
         {
             this.isMoving = false;
             rb.velocity = Vector3.up * ragdollSpeed + Vector3.forward * ragdollSpeed;
@@ -156,40 +157,12 @@ public class MailmanController : MonoBehaviour
         animator.SetFloat(MovementAnimationKey, animationMovement);
     }
 
-    public Coroutine SmoothPositionForHandsCoroutine = null;
-    
-    public void SetSmoothPositionForHands(Vector3 position, Quaternion rotation)
-    {
-        if (SmoothPositionForHandsCoroutine != null) return;
-        Debug.Log("SetSmoothPositionForHands");
-        SmoothPositionForHandsCoroutine = StartCoroutine(SetSmoothPositionForHandsAsync(position, rotation));
-    }
-
-    public IEnumerator SetSmoothPositionForHandsAsync(Vector3 position, Quaternion rotation)
-    {
-        float time = 0f;
-        var current = IkHands.position;
-        var currentRotation = IkHands.rotation;
-        while (time < 0.2f)
-        {
-            var k = time / 0.2f;
-            IkHands.position = Vector3.Lerp(current, position, k);
-            IkHands.rotation = Quaternion.Lerp(currentRotation, rotation, k);
-            yield return null;
-         
-            // Debug.Log("SetSmoothPositionForHands tick");
-            time += Time.deltaTime;
-        }
-        IkHands.position = position;
-        IkHands.rotation = rotation;
-        // StopCoroutine(SmoothPositionForHandsCoroutine);
-        SmoothPositionForHandsCoroutine = null;
-    }
-
     public IEnumerator trackRotation()
     {
-        while (isMoving)
+        while (true)
         {
+            if (!isMoving) yield return null;
+            
             prevRotation = Quaternion.LookRotation(box.forward);
             var current = rb.rotation;
             float time = 0f;
@@ -203,8 +176,6 @@ public class MailmanController : MonoBehaviour
             rb.MoveRotation(prevRotation);
             
         }
-
-        yield return null;
     }
 
     private Coroutine ResetSpeedCorountine = null;
@@ -245,5 +216,34 @@ public class MailmanController : MonoBehaviour
         {
             buffEffectUI.SetDefault();
         }
+    }
+
+    public void SetIsInBox(bool isInBox)
+    {
+        this.isInBox = isInBox;
+        GameUI.Instanse.SetVisibleForDeliverLabel(isInBox);
+    }
+
+    public void EnableMoving()
+    {
+        isMoving = true;
+        animator.SetBool("Walk", true);
+        
+        ragdollController.DisableRagdoll();
+        rb.isKinematic = false;
+        
+        ragdollController.ikController.LeftHandConfig.isEnabled = true;
+        ragdollController.ikController.RightHandConfig.isEnabled = true;
+    }
+
+    public void DisableMoving()
+    {
+        isMoving = false;
+        animator.SetBool("Walk", false);
+
+        rb.isKinematic = true;
+
+        ragdollController.ikController.LeftHandConfig.isEnabled = false;
+        ragdollController.ikController.RightHandConfig.isEnabled = false;
     }
 }

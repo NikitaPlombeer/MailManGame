@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using City;
 using DwarfTrains.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace DefaultNamespace.City
 {
@@ -33,17 +35,38 @@ namespace DefaultNamespace.City
         
         public GameObject borderPrefab;
         
+        public Transform envParent;
+        public Transform obstaclesParent;
+
+        public DeliveryBox boxPrefab;
+        private List<Rectangle> rectangles;
+
+        public Transform humanAndBox;
+        
+        private void Awake()
+        {
+            this.seed = DateTime.Now.Millisecond;
+            MakeCity();
+            SpawnObstacles();
+        }
+
+        [Button("Clear obstacles")]
+        public void ClearObstacles()
+        {
+            GameObjectUtils.ClearChildren(obstaclesParent);
+        }
+        
         [Button("Make City")]
         void MakeCity()
         {
+            Debug.Log("Making city");
             ClearCity();
 
             Random.InitState(seed);
 
             cityGrid = new CityEnvType[mazeWidth, mazeHeight];
-            var rectangles = rectangleGridGenerator.Generate(mazeWidth, mazeHeight);
+            this.rectangles = rectangleGridGenerator.Generate(mazeWidth, mazeHeight);
             Debug.Log("Maze generated");
-
             
             foreach (var rectangle in rectangles)
             {
@@ -71,8 +94,6 @@ namespace DefaultNamespace.City
                 
             }
 
-            SpawnObstacles();
-
             SpawnBorders();
         }
 
@@ -81,14 +102,14 @@ namespace DefaultNamespace.City
 
             for (int y = 0; y < mazeHeight; y += 3)
             {
-                Instantiate(borderPrefab, new Vector3(0f, 0, -blockSize / 2f + y * blockSize), Quaternion.Euler(0f, 90f, 0f), transform);
-                Instantiate(borderPrefab, new Vector3(blockSize * mazeWidth - blockSize, 0, blockSize + y * blockSize), Quaternion.Euler(0f, -90f, 0f), transform);
+                Instantiate(borderPrefab, new Vector3(0f, 0, -blockSize / 2f + y * blockSize), Quaternion.Euler(0f, 90f, 0f), envParent);
+                Instantiate(borderPrefab, new Vector3(blockSize * mazeWidth - blockSize, 0, blockSize + y * blockSize), Quaternion.Euler(0f, -90f, 0f), envParent);
             }
             
             for (int x = 0; x < mazeWidth; x += 3)
             {
-                Instantiate(borderPrefab, new Vector3(2.5f * blockSize + x * blockSize, 0, 0f ), Quaternion.Euler(0f, 0f, 0f), transform);
-                Instantiate(borderPrefab, new Vector3(x * blockSize - blockSize / 2f, 0, blockSize * mazeHeight - blockSize ), Quaternion.Euler(0f, 180f, 0f), transform);
+                Instantiate(borderPrefab, new Vector3(2.5f * blockSize + x * blockSize, 0, 0f ), Quaternion.Euler(0f, 0f, 0f), envParent);
+                Instantiate(borderPrefab, new Vector3(x * blockSize - blockSize / 2f, 0, blockSize * mazeHeight - blockSize ), Quaternion.Euler(0f, 180f, 0f), envParent);
             }
             
             
@@ -114,17 +135,25 @@ namespace DefaultNamespace.City
 
             cityGrid[coord.x, coord.y] = CityEnvType.BUILDING;
             var worldPosition = new Vector3(coord.x * blockSize, 0, coord.y * blockSize);
-            Instantiate(buildings[0], worldPosition, Quaternion.Euler(0f, angle, 0f), transform);
+            Instantiate(buildings[0], worldPosition, Quaternion.Euler(0f, angle, 0f), envParent);
         }
 
+        [Button("SpawnObstacles")]
         public void SpawnObstacles()
         {
+            Debug.Log("Making Obstacles");
+
+            ClearObstacles();
+            SpawnBox();
+            SetHumanPosition();
             for (int x = 0; x < mazeWidth; x++)
             {
                 for (int y = 0; y < mazeHeight; y++)
                 {
                     var coord = new Vector2Int(x, y);
 
+                    if (coord == boxCoord1 || coord == boxCoord2 || coord == humanCoord) continue;
+                    
                     if (isType(coord, CityEnvType.ROAD)
                         && isType(coord + Vector2Int.down, CityEnvType.SIDE_WALK_TOP)
                         && isType(coord + Vector2Int.up, CityEnvType.SIDE_WALK_BOTTOM)
@@ -160,23 +189,83 @@ namespace DefaultNamespace.City
                 }
             }
         }
+
+        public void SetHumanPosition()
+        {
+            var list = new List<Vector2Int>();
+            for (int x = 3; x < mazeWidth / 2; x++)
+            {
+                for (int y = 3; y < mazeHeight / 2; y++)
+                {
+                    var coord = new Vector2Int(x, y);
+                    if (
+                        isType(coord, CityEnvType.ROAD) && 
+                        isType(coord + Vector2Int.right, CityEnvType.ROAD) && 
+                        isType(coord + Vector2Int.up, CityEnvType.ROAD) && 
+                        isType(coord + Vector2Int.down, CityEnvType.ROAD))
+                    {
+                        list.Add(coord);
+                    }
+                }
+            }
+            
+            this.humanCoord = list[Random.Range(0, list.Count)];
+            var humanWorldPosition = GetWorldPosition(humanCoord);
+            // humanWorldPosition.y = 0.5f;
+            humanAndBox.position = humanWorldPosition;
+        }
+
+        private Vector2Int humanCoord;
+        private Vector2Int boxCoord1;
+        private Vector2Int boxCoord2;
+
+        private void SpawnBox()
+        {
+            Debug.Log("Making box");
+            var list = new List<Vector2Int>();
+            for (int x = mazeWidth / 2; x < mazeWidth - 3; x++)
+            {
+                for (int y = mazeHeight / 2; y < mazeHeight - 3; y++)
+                {
+                    var coord = new Vector2Int(x, y);
+                    if (isType(coord, CityEnvType.ROAD) && isType(coord + Vector2Int.right, CityEnvType.ROAD))
+                    {
+                        list.Add(coord);
+                   
+                    }
+                }
+            }
+            
+            this.boxCoord1 = list[Random.Range(0, list.Count)];
+            this.boxCoord2 = boxCoord1 + Vector2Int.right;
+            var w1 = GetWorldPosition(boxCoord1);
+            var w2 = GetWorldPosition(boxCoord2 + Vector2Int.right);
+                        
+            var boxPos = (w1 + w2)/2f;
+            boxPos.y = -2.3f;
+            if (GameManager.Instanse != null)
+            {
+                GameManager.Instanse.deliveryBox = Instantiate(boxPrefab, boxPos, Quaternion.Euler(0f, 90f, 0), obstaclesParent);
+                Debug.Log("Box spawned at " + GameManager.Instanse.deliveryBox.transform.position);
+            }
+        }
         
         private void SpawnFood(Vector2Int coord)
         {
             var worldPosition = GetWorldPosition(coord);
-            Instantiate(foodCollectablePrefabs[Random.Range(0, foodCollectablePrefabs.Count)], worldPosition, Quaternion.identity, transform);
+            Instantiate(foodCollectablePrefabs[Random.Range(0, foodCollectablePrefabs.Count)], worldPosition, Quaternion.identity, obstaclesParent);
         }
         
         private void SpawnCarObstacle(Vector2Int coord, float angle)
         {
             var r1 = GetWorldPosition(coord);
-            Instantiate(carObstacles[Random.Range(0, carObstacles.Count)], (r1), Quaternion.Euler(0f, angle, 0f), transform);
+            Instantiate(carObstacles[Random.Range(0, carObstacles.Count)], (r1), Quaternion.Euler(0f, angle, 0f), obstaclesParent);
         }
         
         private void SpawnSideWalkObstacle(Vector2Int coord, float angle)
         {
             var worldPosition = GetWorldPosition(coord);
-            Instantiate(sideWalkObstacles[Random.Range(0, sideWalkObstacles.Count)], worldPosition, Quaternion.Euler(0f, angle, 0f), transform);
+            Instantiate(sideWalkObstacles[Random.Range(0, sideWalkObstacles.Count)], worldPosition, Quaternion.Euler(0f, angle, 0f), obstaclesParent);
         }
         
         private Vector3 GetWorldPosition(Vector2Int coord)
@@ -238,7 +327,7 @@ namespace DefaultNamespace.City
         {
             var cityEnvPrefab = cityEnvPrefabs[cityEnvType];
             var worldPosition = new Vector3(position.x * blockSize, 0, position.y * blockSize);
-            Instantiate(cityEnvPrefab, worldPosition, Quaternion.identity, transform);
+            Instantiate(cityEnvPrefab, worldPosition, Quaternion.identity, envParent);
             cityGrid[position.x, position.y] = cityEnvType;
         }
     
@@ -246,7 +335,7 @@ namespace DefaultNamespace.City
         [Button("Clear City")]
         public void ClearCity()
         {
-            GameObjectUtils.ClearChildren(transform);
+            GameObjectUtils.ClearChildren(envParent);
         }
     }
     

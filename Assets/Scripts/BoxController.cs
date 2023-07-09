@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DefaultNamespace;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Utils;
@@ -29,7 +30,7 @@ public class BoxController : MonoBehaviour
 
     public float yMovement = 0f;
     
-    public bool isMovingEnabled = true;
+    public bool isMovingEnabled = false;
 
     [BoxGroup("Settings")] 
     public float maxAngle;
@@ -55,6 +56,8 @@ public class BoxController : MonoBehaviour
     [ReadOnly]
     public float rightAngleDiff;
 
+    public Transform arrow;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -165,5 +168,22 @@ public class BoxController : MonoBehaviour
         var direction = (boxPosXZ - mailmanPoxXZ).normalized;
         float angle = Vector3.SignedAngle(Vector3.forward, direction, Vector3.up);
         transform.rotation = Quaternion.Euler(0f, angle, 0f);
+
+        var deliveryBoxTransform = GameManager.Instanse.deliveryBox.transform;
+        var deliveryBoxPosition = deliveryBoxTransform.position.Flatten();
+        var boxPositionXZ = transform.position.Flatten();
+        var deliveryBoxDirection = (deliveryBoxPosition - boxPositionXZ).normalized;
+        var deliveryBoxAngle = Vector3.SignedAngle(Vector3.forward, deliveryBoxDirection, Vector3.up);  
+        arrow.rotation = Quaternion.Euler(0f, deliveryBoxAngle, 0f);
+    }
+
+    public void EnableMoving()
+    {
+        isMovingEnabled = true;
+    }
+
+    public void DisableMoving()
+    {
+        isMovingEnabled = false;
     }
 }

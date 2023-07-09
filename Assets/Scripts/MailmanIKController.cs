@@ -19,12 +19,6 @@ namespace DefaultNamespace
         
         public bool IsIKActive;
         public Animator animator;
-        // private BoxController boxController;
-
-        private void Start()
-        {
-            // this.boxController = FindObjectOfType<BoxController>();
-        }
 
         void OnAnimatorIK(int layerIndex)
         {
@@ -54,14 +48,7 @@ namespace DefaultNamespace
             
                 animator.SetLookAtWeight(0);
             }
-            // boxController.Sync();
         }
-
-        // public void Sync()
-        // {
-            // HandleConfig(AvatarIKGoal.LeftHand, LeftHandConfig);
-            // HandleConfig(AvatarIKGoal.RightHand, RightHandConfig);
-        // }
 
         private void HandleConfig(AvatarIKGoal goal, IKConfig config)
         {
