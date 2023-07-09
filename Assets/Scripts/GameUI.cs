@@ -24,6 +24,6 @@ namespace DefaultNamespace
         {
             deliverLabel.gameObject.SetActive(isVisible);
         }
-        
+
     }
 }

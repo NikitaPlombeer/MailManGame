@@ -169,10 +169,16 @@ public class BoxController : MonoBehaviour
         float angle = Vector3.SignedAngle(Vector3.forward, direction, Vector3.up);
         transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
+        if (GameManager.Instanse == null || GameManager.Instanse.deliveryBox == null)
+        {
+            GameUI.Instanse.SetVisibleForDeliverLabel(true);
+            if (GameManager.Instanse == null) GameUI.Instanse.deliverLabel.Text = "GameManager.Instanse == null";
+            else if (GameManager.Instanse.deliveryBox == null) GameUI.Instanse.deliverLabel.Text = "GameManager.Instanse.deliveryBox == null";
+            return;
+        }
         var deliveryBoxTransform = GameManager.Instanse.deliveryBox.transform;
         var deliveryBoxPosition = deliveryBoxTransform.position.Flatten();
-        var boxPositionXZ = transform.position.Flatten();
-        var deliveryBoxDirection = (deliveryBoxPosition - boxPositionXZ).normalized;
+        var deliveryBoxDirection = (deliveryBoxPosition - boxPosXZ).normalized;
         var deliveryBoxAngle = Vector3.SignedAngle(Vector3.forward, deliveryBoxDirection, Vector3.up);  
         arrow.rotation = Quaternion.Euler(0f, deliveryBoxAngle, 0f);
     }

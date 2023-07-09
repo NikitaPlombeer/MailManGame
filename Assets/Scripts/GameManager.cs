@@ -1,4 +1,5 @@
 using System;
+using DefaultNamespace.City;
 using UnityEngine;
 
 namespace DefaultNamespace
@@ -11,6 +12,7 @@ namespace DefaultNamespace
         public bool isOnBoarding = true;
         public BoxController boxController;
         public MailmanController mailmanController;
+        public CityGenerator cityGenerator;
         
         private void Start()
         {
@@ -18,6 +20,8 @@ namespace DefaultNamespace
             Cursor.lockState = CursorLockMode.Locked;
             boxController.DisableMoving();
             mailmanController.DisableMoving();
+            
+            cityGenerator.GenerateCity();
         }
 
         private void Update()

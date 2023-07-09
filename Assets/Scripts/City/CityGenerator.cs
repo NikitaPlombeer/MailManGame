@@ -43,7 +43,7 @@ namespace DefaultNamespace.City
 
         public Transform humanAndBox;
         
-        private void Awake()
+        public void GenerateCity()
         {
             this.seed = DateTime.Now.Millisecond;
             MakeCity();
