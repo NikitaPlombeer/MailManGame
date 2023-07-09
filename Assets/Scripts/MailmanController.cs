@@ -72,7 +72,8 @@ public class MailmanController : MonoBehaviour
     public float angle;
 
     private Transform box;
-    
+
+    public BuffEffectUI buffEffectUI;
     
     private void Start()
     {
@@ -210,6 +211,15 @@ public class MailmanController : MonoBehaviour
     
     public void UpdateSpeed(bool isSpeedUp)
     {
+        if (buffEffectUI != null)
+        {
+            if (isSpeedUp)
+            {
+                buffEffectUI.SetSpeed();
+            } else {
+                buffEffectUI.SetSlow();
+            }
+        }
         speed = isSpeedUp ? baseSpeed * speedUpMultiplier : baseSpeed * speedDownMultiplier;
         jumpSpeed = isSpeedUp ? baseJumpSpeed * jumpUpMultiplier  : baseSpeed * jumpDownMultiplier;
         
@@ -231,5 +241,9 @@ public class MailmanController : MonoBehaviour
     {
         speed = baseSpeed;
         jumpSpeed = baseJumpSpeed;
+        if (buffEffectUI != null)
+        {
+            buffEffectUI.SetDefault();
+        }
     }
 }

@@ -31,6 +31,8 @@ namespace DefaultNamespace.City
         public float sideWalkSpawnProbability = 0.3f;
         public float foodSpawnProbability = 0.3f;
         
+        public GameObject borderPrefab;
+        
         [Button("Make City")]
         void MakeCity()
         {
@@ -71,6 +73,25 @@ namespace DefaultNamespace.City
 
             SpawnObstacles();
 
+            SpawnBorders();
+        }
+
+        private void SpawnBorders()
+        {
+
+            for (int y = 0; y < mazeHeight; y += 3)
+            {
+                Instantiate(borderPrefab, new Vector3(0f, 0, -blockSize / 2f + y * blockSize), Quaternion.Euler(0f, 90f, 0f), transform);
+                Instantiate(borderPrefab, new Vector3(blockSize * mazeWidth - blockSize, 0, blockSize + y * blockSize), Quaternion.Euler(0f, -90f, 0f), transform);
+            }
+            
+            for (int x = 0; x < mazeWidth; x += 3)
+            {
+                Instantiate(borderPrefab, new Vector3(2.5f * blockSize + x * blockSize, 0, 0f ), Quaternion.Euler(0f, 0f, 0f), transform);
+                Instantiate(borderPrefab, new Vector3(x * blockSize - blockSize / 2f, 0, blockSize * mazeHeight - blockSize ), Quaternion.Euler(0f, 180f, 0f), transform);
+            }
+            
+            
         }
 
         private void SpawnBuilding(Rectangle rectangle, Vector2Int coord)
