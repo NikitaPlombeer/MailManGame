@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.52386564, g: 0.56170434, b: 0.47704506, a: 1}
+  m_IndirectSpecularColor: {r: 0.5238551, g: 0.56166667, b: 0.47704232, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1007,6 +1007,41 @@ PrefabInstance:
         type: 3}
       propertyPath: visuals.Gradient.Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2905764967384224462, guid: f158315646bf74a469edf81a3b741560,
+        type: 3}
+      propertyPath: OnClicked.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2905764967384224462, guid: f158315646bf74a469edf81a3b741560,
+        type: 3}
+      propertyPath: OnClicked.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2905764967384224462, guid: f158315646bf74a469edf81a3b741560,
+        type: 3}
+      propertyPath: OnClicked.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1684029265}
+    - target: {fileID: 2905764967384224462, guid: f158315646bf74a469edf81a3b741560,
+        type: 3}
+      propertyPath: OnClicked.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2905764967384224462, guid: f158315646bf74a469edf81a3b741560,
+        type: 3}
+      propertyPath: OnClicked.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnStartClick
+      objectReference: {fileID: 0}
+    - target: {fileID: 2905764967384224462, guid: f158315646bf74a469edf81a3b741560,
+        type: 3}
+      propertyPath: OnClicked.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: DefaultNamespace.MainMenu, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2905764967384224462, guid: f158315646bf74a469edf81a3b741560,
+        type: 3}
+      propertyPath: OnClicked.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 2905764967384224463, guid: f158315646bf74a469edf81a3b741560,
         type: 3}
@@ -2129,6 +2164,7 @@ GameObject:
   - component: {fileID: 1684029263}
   - component: {fileID: 1684029262}
   - component: {fileID: 1684029264}
+  - component: {fileID: 1684029265}
   m_Layer: 0
   m_Name: RootPanel
   m_TagString: Untagged
@@ -2156,7 +2192,7 @@ MonoBehaviour:
         Raw: 1920
         Type: 0
       Y:
-        Raw: 1173.8759
+        Raw: 1135.2914
         Type: 0
       Z:
         Raw: 0
@@ -2404,7 +2440,7 @@ Transform:
   m_GameObject: {fileID: 1684029258}
   m_LocalRotation: {x: 0.13114224, y: -0, z: -0, w: 0.9913636}
   m_LocalPosition: {x: -0.16, y: 2.8599806, z: -2.4943967}
-  m_LocalScale: {x: 0.0009836649, y: 0.0009836649, z: 0.0009836649}
+  m_LocalScale: {x: 0.0010170962, y: 0.0010170962, z: 0.0010170962}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 952622160}
@@ -2456,7 +2492,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5da66ad707f865b42af2bec2bfe3f63b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 0}
+  cam: {fileID: 7348673}
   mouseEnabled: 1
   invertScrolling: 1
   touchEnabled: 1
@@ -2470,6 +2506,18 @@ MonoBehaviour:
   RightKey: 275
   SelectKey: 13
   DeselectKey: 27
+--- !u!114 &1684029265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1684029258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95be984d798a4f8a907185592813faac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1731442125
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2591,7 +2639,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: We Deliver
+  m_text: We Deliver Humans
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8a89fa14b10d46a99122fd4f73fca9a2, type: 2}
   m_sharedMaterial: {fileID: 2140474, guid: 8a89fa14b10d46a99122fd4f73fca9a2, type: 2}
