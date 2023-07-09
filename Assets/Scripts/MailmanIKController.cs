@@ -14,6 +14,9 @@ namespace DefaultNamespace
         public IKConfig LeftFootConfig;
         public IKConfig RightFootConfig;
     
+        public Transform lookAtTarget;
+        public bool isLookAtActive = false;
+        
         public bool IsIKActive;
         public Animator animator;
         // private BoxController boxController;
@@ -31,6 +34,16 @@ namespace DefaultNamespace
                 HandleConfig(AvatarIKGoal.RightHand, RightHandConfig);
                 HandleConfig(AvatarIKGoal.LeftFoot, LeftFootConfig);
                 HandleConfig(AvatarIKGoal.RightFoot, RightFootConfig);
+
+                if (isLookAtActive)
+                {
+                    animator.SetLookAtWeight(1f);
+                    animator.SetLookAtPosition(lookAtTarget.position);
+                }
+                else
+                {
+                    animator.SetLookAtWeight(0);
+                }
             }
             else
             {
