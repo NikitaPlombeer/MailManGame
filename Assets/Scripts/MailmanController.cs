@@ -96,6 +96,7 @@ public class MailmanController : MonoBehaviour
             boxController.isMovingEnabled = false;
             Invoke(nameof(EnableRagdoll), 0.2f);
             EnableRagdoll();
+            GameManager.Instanse.Delivered();
             return;
         }
 
@@ -221,7 +222,10 @@ public class MailmanController : MonoBehaviour
     public void SetIsInBox(bool isInBox)
     {
         this.isInBox = isInBox;
-        GameUI.Instanse.SetVisibleForDeliverLabel(isInBox);
+        if (isMoving)
+        {
+            GameUI.Instanse.SetVisibleForDeliverLabel(isInBox);
+        }
     }
 
     public void EnableMoving()

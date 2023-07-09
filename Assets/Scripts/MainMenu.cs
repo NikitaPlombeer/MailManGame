@@ -10,5 +10,10 @@ namespace DefaultNamespace
         {
             SceneManager.LoadScene("CityGeneration");
         }
+
+        public void OnExitClick()
+        {
+            Application.Quit();
+        }
     }
 }

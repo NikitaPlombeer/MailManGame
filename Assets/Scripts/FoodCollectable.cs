@@ -1,4 +1,5 @@
 using System;
+using DwarfTrains.Sound;
 using UnityEngine;
 
 namespace DefaultNamespace
@@ -19,6 +20,14 @@ namespace DefaultNamespace
             if (other.CompareTag("Player"))
             {
                 other.gameObject.GetComponent<MailmanController>().UpdateSpeed(isSpeedUp);
+                if (isSpeedUp)
+                {
+                    GlobalSoundManager.Instanse.PlaySound("Coke");
+                }
+                else
+                {
+                    GlobalSoundManager.Instanse.PlaySound("Hamburger");
+                }
                 Destroy(gameObject);
             }
         }
