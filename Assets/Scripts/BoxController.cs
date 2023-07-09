@@ -68,7 +68,7 @@ public class BoxController : MonoBehaviour
 
     // Update is called once per frame
     
-    void Update()
+    void LateUpdate()
     {
         Sync();
     }

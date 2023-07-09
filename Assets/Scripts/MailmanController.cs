@@ -95,6 +95,8 @@ public class MailmanController : MonoBehaviour
         isJumpOnCooldown = false;
     }
 
+    public Transform IkHands;
+    
     public Quaternion prevRotation = Quaternion.LookRotation(Vector3.forward);
     private void FixedUpdate()
     {
@@ -112,6 +114,13 @@ public class MailmanController : MonoBehaviour
         }
         var translation = direction * (speed * speedK) * Time.fixedDeltaTime;
         rb.MovePosition(transform.position + translation);
+        // IkHands.position = boxPosition;
+        // IkHands.rotation = Quaternion.LookRotation(box.forward);
+        
+        IkHands.position = Vector3.Lerp(IkHands.position, boxPosition, 0.2f);
+        IkHands.rotation = Quaternion.Lerp(IkHands.rotation,  Quaternion.LookRotation(box.forward), 0.2f);
+        
+        // SetSmoothPositionForHands(boxPosition, Quaternion.LookRotation(box.forward));
         // var velocityY = rb.velocity.y;
         // rb.velocity = (translation / Time.fixedDeltaTime).Flatten(velocityY);
         // boxController.SetPosition();
@@ -123,6 +132,36 @@ public class MailmanController : MonoBehaviour
         angle = Vector3.SignedAngle(transform.forward, direction, Vector3.up);
         animationMovement = Mathf.Clamp01((angle / boxController.maxAngle + 1f) / 2f);
         animator.SetFloat(MovementAnimationKey, animationMovement);
+    }
+
+    public Coroutine SmoothPositionForHandsCoroutine = null;
+    
+    public void SetSmoothPositionForHands(Vector3 position, Quaternion rotation)
+    {
+        if (SmoothPositionForHandsCoroutine != null) return;
+        Debug.Log("SetSmoothPositionForHands");
+        SmoothPositionForHandsCoroutine = StartCoroutine(SetSmoothPositionForHandsAsync(position, rotation));
+    }
+
+    public IEnumerator SetSmoothPositionForHandsAsync(Vector3 position, Quaternion rotation)
+    {
+        float time = 0f;
+        var current = IkHands.position;
+        var currentRotation = IkHands.rotation;
+        while (time < 0.2f)
+        {
+            var k = time / 0.2f;
+            IkHands.position = Vector3.Lerp(current, position, k);
+            IkHands.rotation = Quaternion.Lerp(currentRotation, rotation, k);
+            yield return null;
+         
+            // Debug.Log("SetSmoothPositionForHands tick");
+            time += Time.deltaTime;
+        }
+        IkHands.position = position;
+        IkHands.rotation = rotation;
+        // StopCoroutine(SmoothPositionForHandsCoroutine);
+        SmoothPositionForHandsCoroutine = null;
     }
 
     public IEnumerator trackRotation()

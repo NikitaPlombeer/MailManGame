@@ -107,7 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e3cd8cf45ede49bd957200e8a3db7bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  angleSpeed: 30
+  angleSpeed: 60
   speedX: 1
   speedY: 3
   radius: 0
@@ -1495,12 +1495,12 @@ MonoBehaviour:
   boxController: {fileID: 5145768715353643059}
   ragdollController: {fileID: 5145768715808337592}
   isMoving: 1
-  speed: 5
+  speed: 4
   jumpSpeed: 4
   animationMovement: 0.5
   mouseShiftToJump: 6
   ragdollSpeed: 10
-  rotationSyncTime: 1.5
+  rotationSyncTime: 1
   isJumpOnCooldown: 0
   angle: 0
   prevRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -4732,7 +4732,7 @@ Transform:
   - {fileID: 5145768715353643063}
   - {fileID: 5145768715215180161}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &493949572
 MonoBehaviour:
@@ -4840,7 +4840,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5208195773060650542}
   - component: {fileID: 2877278427250302757}
-  - component: {fileID: 4702611082090623037}
   - component: {fileID: 5674733025131184724}
   m_Layer: 0
   m_Name: BoxView
@@ -4915,14 +4914,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &4702611082090623037
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7353134579849484757}
-  m_Enabled: 1
 --- !u!114 &5674733025131184724
 MonoBehaviour:
   m_ObjectHideFlags: 0
