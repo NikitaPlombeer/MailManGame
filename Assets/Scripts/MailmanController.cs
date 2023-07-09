@@ -26,10 +26,20 @@ public class MailmanController : MonoBehaviour
     public bool isMoving = true;
     
     [BoxGroup("Movement")]
-    public float speed = 3;
+    public float baseSpeed = 4;
+
+    [BoxGroup("Movement")]
+    [ReadOnly]
+    public float speed = 4;
     
     [BoxGroup("Movement")]
+    public float baseJumpSpeed = 5;
+    
+    [BoxGroup("Movement")]
+    [ReadOnly]
     public float jumpSpeed = 5;
+    
+    public float speedUpTime = 5f;
     
     [BoxGroup("Movement")]
     public float animationMovement = 0.5f;
@@ -47,7 +57,15 @@ public class MailmanController : MonoBehaviour
     [ReadOnly]
     public bool isJumpOnCooldown = false;
 
-   
+    [BoxGroup("Buffs")]
+    public float speedUpMultiplier = 2f;
+    [BoxGroup("Buffs")]
+    public float jumpUpMultiplier = 2f;
+    [BoxGroup("Buffs")]
+    public float speedDownMultiplier = 0.8f;
+    [BoxGroup("Buffs")]
+    public float jumpDownMultiplier = 0.8f;
+
     
     [BoxGroup("Debug")]
     [ReadOnly]
@@ -60,6 +78,9 @@ public class MailmanController : MonoBehaviour
     {
         box = boxController.transform;
         StartCoroutine(trackRotation());
+        
+        jumpSpeed = baseJumpSpeed;
+        speed = baseSpeed;
     }
 
     private void Update()
@@ -113,7 +134,7 @@ public class MailmanController : MonoBehaviour
             speedK = 1f;
         }
         var translation = direction * (speed * speedK) * Time.fixedDeltaTime;
-        rb.MovePosition(transform.position + translation);
+        // rb.MovePosition(transform.position + translation);
         // IkHands.position = boxPosition;
         // IkHands.rotation = Quaternion.LookRotation(box.forward);
         
@@ -121,8 +142,8 @@ public class MailmanController : MonoBehaviour
         IkHands.rotation = Quaternion.Lerp(IkHands.rotation,  Quaternion.LookRotation(box.forward), 0.2f);
         
         // SetSmoothPositionForHands(boxPosition, Quaternion.LookRotation(box.forward));
-        // var velocityY = rb.velocity.y;
-        // rb.velocity = (translation / Time.fixedDeltaTime).Flatten(velocityY);
+        var velocityY = rb.velocity.y;
+        rb.velocity = (translation / Time.fixedDeltaTime).Flatten(velocityY);
         // boxController.SetPosition();
         // boxPosition += translation;
         // box.position = boxPosition;
@@ -185,4 +206,30 @@ public class MailmanController : MonoBehaviour
         yield return null;
     }
 
+    private Coroutine ResetSpeedCorountine = null;
+    
+    public void UpdateSpeed(bool isSpeedUp)
+    {
+        speed = isSpeedUp ? baseSpeed * speedUpMultiplier : baseSpeed * speedDownMultiplier;
+        jumpSpeed = isSpeedUp ? baseJumpSpeed * jumpUpMultiplier  : baseSpeed * jumpDownMultiplier;
+        
+        if (ResetSpeedCorountine != null)
+        {
+            StopCoroutine(ResetSpeedCorountine);
+        }
+        ResetSpeedCorountine = StartCoroutine(ResetSpeedAsync());
+    }
+    
+    
+    public IEnumerator ResetSpeedAsync()
+    {
+        yield return new WaitForSeconds(speedUpTime);
+        ResetSpeed();
+    }
+    
+    private void ResetSpeed()
+    {
+        speed = baseSpeed;
+        jumpSpeed = baseJumpSpeed;
+    }
 }

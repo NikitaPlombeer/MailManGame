@@ -12,7 +12,6 @@ namespace City
         public int maxWidth = 20;
         public int maxHeight = 20;
 
-        public int seed = 1;
         
         private List<Rectangle> rectangles;
 
@@ -20,7 +19,6 @@ namespace City
         {
             rectangles = new List<Rectangle>();
 
-            Random.InitState(seed);
 
             SplitGrid(0, 0, gridWidth, gridHeight);
 
