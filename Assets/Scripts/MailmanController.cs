@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using DefaultNamespace;
 using Sirenix.OdinInspector;
@@ -131,20 +132,13 @@ public class MailmanController : MonoBehaviour
         var boxPosXZ = boxPosition.Flatten();
         var direction = (boxPosXZ - mailmanPoxXZ).normalized;
         
-        var speedK = Mathf.Clamp(1f - boxController.yMovement, 0.7f, 1f);
-        if (isJumpOnCooldown)
-        {
-            speedK = 1f;
-        }
-        var translation = direction * (speed * speedK) * Time.fixedDeltaTime;
+
+        var translation = direction * (speed * 1f) * Time.fixedDeltaTime;
         // rb.MovePosition(transform.position + translation);
-        // IkHands.position = boxPosition;
-        // IkHands.rotation = Quaternion.LookRotation(box.forward);
         
         IkHands.position = Vector3.Lerp(IkHands.position, boxPosition, 0.2f);
         IkHands.rotation = Quaternion.Lerp(IkHands.rotation,  Quaternion.LookRotation(box.forward), 0.2f);
         
-        // SetSmoothPositionForHands(boxPosition, Quaternion.LookRotation(box.forward));
         var velocityY = rb.velocity.y;
         rb.velocity = (translation / Time.fixedDeltaTime).Flatten(velocityY);
         // boxController.SetPosition();
@@ -156,6 +150,13 @@ public class MailmanController : MonoBehaviour
         angle = Vector3.SignedAngle(transform.forward, direction, Vector3.up);
         animationMovement = Mathf.Clamp01((angle / boxController.maxAngle + 1f) / 2f);
         animator.SetFloat(MovementAnimationKey, animationMovement);
+    }
+
+    private bool IsObstacleInFront()
+    {
+        var humanTransform = transform;
+        var ray = new Ray(humanTransform.position, humanTransform.forward);
+        return Physics.Raycast(ray, out var hit, 1f);
     }
 
     public IEnumerator trackRotation()

@@ -135,7 +135,7 @@ namespace DefaultNamespace.City
 
             cityGrid[coord.x, coord.y] = CityEnvType.BUILDING;
             var worldPosition = new Vector3(coord.x * blockSize, 0, coord.y * blockSize);
-            Instantiate(buildings[0], worldPosition, Quaternion.Euler(0f, angle, 0f), envParent);
+            Instantiate(buildings[Random.Range(0, buildings.Count)], worldPosition, Quaternion.Euler(0f, angle, 0f), envParent);
         }
 
         [Button("SpawnObstacles")]
